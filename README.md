@@ -73,7 +73,6 @@ a directory structure like follows:
 
 You will need to create the `deploy/${PROJECT_ID}/${CLUSTER_NAME}` directory for each you cluster you deploy
 the provisioner on.
-the provisioner on. For example:
 
 Next, copy the files from `deploy/example-project/example-cluster` into your new `deploy/${PROJECT_ID}/${CLUSTER_NAME}`
 directory and update the templated values in the yaml files to match your own.
@@ -123,13 +122,20 @@ export CONTAINER_IMAGE=us-docker.pkg.dev/${PROJECT_ID}/default/tpu-provisioner:$
 make docker-build docker-push IMG=${CONTAINER_IMAGE}
 ```
 
-Set the container image override, ${CONTAINER_IMAGE}, in the manifests in `config/manager/manager.yaml
+Set the container image in the manifests.
+
+```bash
+cd ./deploy/${PROJECT_ID}/${CLUSTER_NAME}
+kustomize edit set image controller=${CONTAINER_IMAGE}
+cd -
 ```
+
+Edit the settings in the `./deploy/${PROJECT_ID}/${CLUSTER_NAME}/` directory to match your project (ConfigMap values and ServiceAccount annotation).
 
 Deploy controller.
 
 ```sh
-kubectl apply --server-side -k ./config/default/
+kubectl apply --server-side -k ./deploy/${PROJECT_ID}/${CLUSTER_NAME}
 ```
 
 
