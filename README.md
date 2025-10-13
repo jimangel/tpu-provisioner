@@ -73,9 +73,41 @@ a directory structure like follows:
 
 You will need to create the `deploy/${PROJECT_ID}/${CLUSTER_NAME}` directory for each you cluster you deploy
 the provisioner on.
+the provisioner on. For example:
 
 Next, copy the files from `deploy/example-project/example-cluster` into your new `deploy/${PROJECT_ID}/${CLUSTER_NAME}`
 directory and update the templated values in the yaml files to match your own.
+```sh
+export PROJECT_ID=my-gcp-project
+export CLUSTER_NAME=my-gke-cluster
+mkdir -p deploy/${PROJECT_ID}/${CLUSTER_NAME}
+```
+
+Next, create a `kustomization.yaml` file inside this new directory to define your cluster-specific overlay.
+
+`deploy/${PROJECT_ID}/${CLUSTER_NAME}/kustomization.yaml`:
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../../config/default
+namespace: tpu-provisioner-system
+patches:
+- path: manager_service_account_patch.yaml
+```
+
+You will also need to create a patch to annotate the controller's ServiceAccount for Workload Identity.
+
+`deploy/${PROJECT_ID}/${CLUSTER_NAME}/manager_service_account_patch.yaml`:
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: controller-manager
+  namespace: system
+  annotations:
+    iam.gke.io/gcp-service-account: tpu-provisioner@${PROJECT_ID}.iam.gserviceaccount.com
+```
 
 ### Building and Deploying the Controller
 
@@ -83,7 +115,7 @@ Build and push your image. For example:
 
 ```bash
 export PROJECT_ID=example-project
-export CLUSTER_NAME=ray-cluster
+export CLUSTER_NAME=example-cluster
 ```
 
 ```bash
@@ -91,20 +123,13 @@ export CONTAINER_IMAGE=us-docker.pkg.dev/${PROJECT_ID}/default/tpu-provisioner:$
 make docker-build docker-push IMG=${CONTAINER_IMAGE}
 ```
 
-Set the container image in the manifests.
-
-```bash
-cd ./deploy/${PROJECT_ID}/${CLUSTER_NAME}
-kustomize edit set image controller=${CONTAINER_IMAGE}
-cd -
+Set the container image override, ${CONTAINER_IMAGE}, in the manifests in `config/manager/manager.yaml
 ```
-
-Edit the settings in the `./deploy/${PROJECT_ID}/${CLUSTER_NAME}/` directory to match your project (ConfigMap values and ServiceAccount annotation).
 
 Deploy controller.
 
 ```sh
-kubectl apply --server-side -k ./deploy/${PROJECT_ID}/${CLUSTER_NAME}
+kubectl apply --server-side -k ./config/default/
 ```
 
 
