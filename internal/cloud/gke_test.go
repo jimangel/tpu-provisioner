@@ -256,6 +256,46 @@ func Test_tpuTopologyToNodeCount(t *testing.T) {
 			topo:  "1x1x1",
 			err:   true,
 		},
+		{
+			accel: "tpu7x",
+			topo:  "1x2x2",
+			count: 1,
+		},
+		{
+			accel: "tpu7x",
+			topo:  "2x2x2",
+			count: 2,
+		},
+		{
+			accel: "tpu7x",
+			topo:  "2x2x4",
+			count: 4,
+		},
+		{
+			accel: "tpu7x",
+			topo:  "2x4x4",
+			count: 8,
+		},
+		{
+			accel: "tpu7x",
+			topo:  "4x4x4",
+			count: 16,
+		},
+		{
+			accel: "tpu7x",
+			topo:  "4x4x8",
+			count: 32,
+		},
+		{
+			accel: "tpu7x",
+			topo:  "8x8x8",
+			count: 128,
+		},
+		{
+			accel: "tpu7x",
+			topo:  "8x8x16",
+			count: 256,
+		},
 	}
 
 	for _, c := range cases {
@@ -312,6 +352,11 @@ func Test_tpuMachineType(t *testing.T) {
 			accel:      "tpu-v5p-slice",
 			tpuRequest: -1,
 			err:        true,
+		},
+		{
+			accel:       "tpu7x",
+			tpuRequest:  4,
+			machineType: "tpu7x-standard-4t",
 		},
 	}
 
