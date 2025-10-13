@@ -83,7 +83,7 @@ Build and push your image. For example:
 
 ```bash
 export PROJECT_ID=example-project
-export CLUSTER_NAME=ray-cluster
+export CLUSTER_NAME=example-cluster
 ```
 
 ```bash
