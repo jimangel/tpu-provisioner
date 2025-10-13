@@ -76,37 +76,6 @@ the provisioner on.
 
 Next, copy the files from `deploy/example-project/example-cluster` into your new `deploy/${PROJECT_ID}/${CLUSTER_NAME}`
 directory and update the templated values in the yaml files to match your own.
-```sh
-export PROJECT_ID=my-gcp-project
-export CLUSTER_NAME=my-gke-cluster
-mkdir -p deploy/${PROJECT_ID}/${CLUSTER_NAME}
-```
-
-Next, create a `kustomization.yaml` file inside this new directory to define your cluster-specific overlay.
-
-`deploy/${PROJECT_ID}/${CLUSTER_NAME}/kustomization.yaml`:
-```yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-- ../../../../config/default
-namespace: tpu-provisioner-system
-patches:
-- path: manager_service_account_patch.yaml
-```
-
-You will also need to create a patch to annotate the controller's ServiceAccount for Workload Identity.
-
-`deploy/${PROJECT_ID}/${CLUSTER_NAME}/manager_service_account_patch.yaml`:
-```yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: controller-manager
-  namespace: system
-  annotations:
-    iam.gke.io/gcp-service-account: tpu-provisioner@${PROJECT_ID}.iam.gserviceaccount.com
-```
 
 ### Building and Deploying the Controller
 
