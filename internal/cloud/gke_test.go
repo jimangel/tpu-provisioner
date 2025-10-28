@@ -364,6 +364,11 @@ func Test_tpuMachineType(t *testing.T) {
 			machineType: "ct6e-standard-4t",
 		},
 		{
+			accel:       "tpu-v6e-slice",
+			tpuRequest:  8,
+			machineType: "ct6e-standard-8t",
+		},
+		{
 			accel:      "not-an-accel",
 			tpuRequest: 4,
 			err:        true,
