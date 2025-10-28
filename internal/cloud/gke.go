@@ -473,7 +473,9 @@ func (g *GKE) nodePoolForPod(p *corev1.Pod) (*containerv1beta1.NodePool, error) 
 		placementPolicy.PolicyName = fmt.Sprintf("tpu-provisioner-%v", tpuTopo)
 	} else {
 		// For non-v7x, placement policies are only used for multi-host topologies
-		singleHost := strings.HasSuffix(machineType, "1t") || machineType == "ct6e-standard-8t" || machineType == "ct6e-standard-4t"
+		singleHost := strings.HasSuffix(machineType, "1t") ||
+			machineType == "ct6e-standard-8t" ||
+			(machineType == "ct6e-standard-4t" && nodeCount == 1)
 		if !singleHost {
 			placementPolicy.TpuTopology = tpuTopo
 			placementPolicy.Type = "COMPACT"
